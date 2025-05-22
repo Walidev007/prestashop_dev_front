@@ -1,0 +1,20 @@
+FROM prestashop/prestashop:latest
+
+# Mise à jour et installation des paquets nécessaires
+RUN apt-get update && \
+    apt-get install -y git curl gnupg zip unzip && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g npm && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    apt-get clean
+
+# Clone prestashop theme
+RUN git clone ${prestashop_theme_git}
+
+# Clone install dependencies of theme
+RUN cd /var/www/html && \
+    npm install && \
+    npm run build
+
+WORKDIR /var/www/html
